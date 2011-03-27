@@ -3,6 +3,7 @@ class User
 
   include MongoMapper::Document
   many :authorizations, :dependant => :destroy
+  many :notifications, :dependant => :destroy
 
   # Make the username required
   # However, this will break it when email authorization is used
@@ -12,8 +13,8 @@ class User
   key :email, String #, :unique => true, :allow_nil => true
 
   # eff you mongo_mapper.
-  validates_uniqueness_of :email, :allow_nil => :true 
-  validates_uniqueness_of :username, :allow_nil => :true 
+  validates_uniqueness_of :email, :allow_nil => :true
+  validates_uniqueness_of :username, :allow_nil => :true
 
   # validate users don't have @ in their usernames
   validate :no_at
@@ -97,6 +98,7 @@ class User
       followee = User.first(:author_id => f.author.id)
       followee.followers << self.feed
       followee.save
+      FollowedNotification.new(:user => followee, :target => self).save
     end
 
     f
