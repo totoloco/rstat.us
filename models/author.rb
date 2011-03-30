@@ -3,9 +3,9 @@ class Author
   ENCODED_DEFAULT_AVATAR = URI.encode_www_form_component(DEFAULT_AVATAR)
 
   GRAVATAR_HOST  = "gravatar.com"
-  
+
   include MongoMapper::Document
-  
+
   key :username, String
   key :name, String
   key :email, String
@@ -15,7 +15,8 @@ class Author
 
   one :feed
   one :user
-  
+  many :notifications, :dependant => :destroy
+
  # The url of their profile page
   key :remote_url, String
   

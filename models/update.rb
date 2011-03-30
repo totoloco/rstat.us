@@ -29,6 +29,7 @@ class Update
   has_many :mentioned_feeds, :in => :mentioned_feed_ids, :class_name => "Feed"
 
   before_create :search_mentions
+  after_create :create_mention_notifications
 
   key :remote_url
   key :referral_id
@@ -80,16 +81,7 @@ class Update
     self[:language] = self.text.language
   end
 
-  def search_mentions
-    nicks = text.scan(/@(\w*)/).flatten
-    Author.all(:username.in => nicks, :fields => ['_id']).each do |author|
-      self[:mentioned_ids] << author.id
-      self[:mentioned_feed_ids] << author.feed.id
-    end
-  end
-
   protected
-  
   # Generate and store the html
   def generate_html
     out = CGI.escapeHTML(text)
@@ -114,10 +106,10 @@ class Update
 
   # If a user has twitter or facebook enabled on their account and they checked
   # either twitter, facebook or both on update form, repost the update to
-  # facebook or twitter. 
+  # facebook or twitter.
   def send_to_external_accounts
     return if ENV['RACK_ENV'] == 'development'
-    
+
     # If there is no user we can't get to the oauth tokens, abort!
     if author.user
       # If the twitter flag is true and the user has a twitter account linked
@@ -136,7 +128,7 @@ class Update
           #I should be shot for doing this.
         end
       end
-      
+
       # If the facebook flag is true and the user has a facebook account linked
       # send the update
       if self.facebook? && author.user.facebook?
@@ -151,4 +143,19 @@ class Update
 
   end
 
+  def search_mentions
+    nicks = text.scan(/@(\w*)/).flatten
+    Author.all(:username.in => nicks, :fields => ['_id']).each do |author|
+      self[:mentioned_ids] << author.id
+      self[:mentioned_feed_ids] << author.feed.id
+    end
+
+    def create_mention_notifications
+      self.mentioned.each do |author|
+        notification = MentionedNotification.new(:author => author)
+        notification.target = self
+        notification.save
+      end
+    end
+  end
 end

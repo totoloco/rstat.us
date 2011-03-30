@@ -6,7 +6,7 @@ class Rstatus
   get '/users/new' do
     haml :"users/new"
   end
-  
+
   # Password reset for users that are currently logged in. If a user does not
   # have an email address they are prompted to enter one
   get '/users/password_reset' do
@@ -17,7 +17,7 @@ class Rstatus
     end
   end
 
-  
+
   # Submitted passwords are checked for length and confirmation. If the user
   # does not have an email address they are required to provide one. Once the
   # password has been reset the user is redirected to /
@@ -35,8 +35,8 @@ class Rstatus
         redirect "/users/password_reset"
         return
       end
-      
-      if current_user.email.nil? 
+
+      if current_user.email.nil?
         if params[:email].empty?
           flash[:notice] = "Email must be provided"
           redirect "/users/password_reset"
@@ -45,7 +45,7 @@ class Rstatus
           current_user.email = params[:email]
         end
       end
-      
+
       current_user.password = params[:password]
       current_user.save
       flash[:notice] = "Password successfully set"
@@ -190,7 +190,7 @@ class Rstatus
     #build title
     title = ""
     title << "#{@user.username}'s Following"
-    
+
     haml :"users/list", :locals => {:title => title}
   end
 
@@ -206,7 +206,7 @@ class Rstatus
     set_params_page
 
     feeds = User.first(:username => params[:username]).followers
-    
+
     @user = User.first(:username => params[:username])
     @users = feeds.paginate(:page => params[:page], :per_page => params[:per_page], :order => :id.desc).map{|f| f.author.user}
 
@@ -219,7 +219,7 @@ class Rstatus
 
     haml :"users/list", :locals => {:title => title}
   end
-  
+
   delete '/users/:username/auth/:provider' do
     user = User.first(:username => params[:username])
     if user

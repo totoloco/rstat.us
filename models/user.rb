@@ -3,7 +3,6 @@ class User
 
   include MongoMapper::Document
   many :authorizations, :dependant => :destroy
-  many :notifications, :dependant => :destroy
 
   # Make the username required
   # However, this will break it when email authorization is used
@@ -47,24 +46,23 @@ class User
   def url
     feed.local? ? "/users/#{feed.author.username}" : feed.author.url
   end
-  
 
   def twitter?
     has_authorization?(:twitter)
   end
-  
+
   def twitter
     get_authorization(:twitter)
   end
-  
+
   def facebook?
     has_authorization?(:facebook)
   end
-  
+
   def facebook
     get_authorization(:facebook)
   end
-  
+
   # Check if a a user has a certain authorization by providing the assoaciated
   # provider
   def has_authorization?(auth)
@@ -72,7 +70,7 @@ class User
     #return false if not authenticated and true otherwise.
     !a.nil?
   end
-  
+
   # Get an authorization by providing the assoaciated provider
   def get_authorization(auth)
     Authorization.first(:provider => auth.to_s, :user_id => self.id)
@@ -106,7 +104,9 @@ class User
       followee = User.first(:author_id => f.author.id)
       followee.followers << self.feed
       followee.save
-      FollowedNotification.new(:user => followee, :target => self).save
+      notification = FollowedNotification.new(:author_id => f.author_id)
+      notification.target = self
+      notification.save
     end
 
     f
@@ -167,7 +167,7 @@ class User
     @password = pass
     self.hashed_password = BCrypt::Password.create(@password, :cost => 10)
   end
-  
+
   # Create a new perishable token and set the date the password reset token was
   # sent so tokens can be expired after 2 days
   def set_password_reset_token
@@ -175,7 +175,7 @@ class User
     set_perishable_token
     self.perishable_token
   end
-  
+
   # Set a new password, clear the date the password reset token was sent and
   # reset the perishable token
   def reset_password(pass)
@@ -227,7 +227,7 @@ class User
   # validation that checks @s in usernames
   def no_at
     unless (username =~ /@/).nil?
-      errors.add(:username, "can't have @.") 
+      errors.add(:username, "can't have @.")
     end
   end
 end
