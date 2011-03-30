@@ -1,23 +1,14 @@
 require 'require_relative' if RUBY_VERSION[0,3] == '1.8'
 require_relative 'test_helper'
 
-class RstatusTest < MiniTest::Unit::TestCase
+class RstatusAuthTest < MiniTest::Unit::TestCase
 
   include TestHelper
 
   def test_add_twitter_to_account
     u = Factory(:user)
-    OmniAuth.config.add_mock(:twitter, {
-      :uid => "78654",
-      :user_info => {
-        :name => "Joe Public",
-        :nickname => u.username,
-        :urls => { :Website => "http://rstat.us" },
-        :description => "A description",
-        :image => "/images/something.png"
-      },
-      :credentials => {:token => "1111", :secret => "2222"}
-    })
+    omni_mock(u.username, {:uid => 78654, :token => "1111", :secret => "2222"})
+
     log_in_email(u)
     visit "/users/#{u.username}/edit"
     click_button "Add Twitter Account"
@@ -44,18 +35,8 @@ class RstatusTest < MiniTest::Unit::TestCase
 
   def test_add_facebook_to_account
     u = Factory(:user)
-    OmniAuth.config.add_mock(:facebook, {
-      :uid => 78654,
-      :user_info => {
-        :name => "Joe Public",
-        :email => "joe@public.com",
-        :nickname => u.username,
-        :urls => { :Website => "http://rstat.us" },
-        :description => "A description",
-        :image => "/images/something.png"
-      },
-      :credentials => {:token => "1111", :secret => "2222"}
-    })
+    omni_mock(u.username, {:provider => "facebook", :uid => 78654, :token => "1111", :secret => "2222"})
+
     log_in_email(u)
     visit "/users/#{u.username}/edit"
     click_button "Add Facebook Account"
@@ -146,9 +127,11 @@ class RstatusTest < MiniTest::Unit::TestCase
     a = Factory(:authorization, :user => u)
     log_in(u, a.uid)
 
-    fill_in "text", :with => update_text
-    check("tweet")
-    click_button "Share"
+    VCR.use_cassette('publish_to_hub') do
+      fill_in "text", :with => update_text
+      check("tweet")
+      click_button "Share"
+    end
 
     assert_match /Update created/, page.body
   end
@@ -161,9 +144,11 @@ class RstatusTest < MiniTest::Unit::TestCase
 
     log_in_fb(u, a.uid)
 
-    fill_in "text", :with => update_text
-    check("facebook")
-    click_button "Share"
+    VCR.use_cassette('publish_to_hub') do
+      fill_in "text", :with => update_text
+      check("facebook")
+      click_button "Share"
+    end
 
     assert_match /Update created/, page.body
   end
@@ -179,10 +164,12 @@ class RstatusTest < MiniTest::Unit::TestCase
 
     log_in(u, a.uid)
     
-    fill_in "text", :with => update_text
-    check("facebook")
-    check("tweet")
-    click_button "Share"
+    VCR.use_cassette('publish_to_hub') do
+      fill_in "text", :with => update_text
+      check("facebook")
+      check("tweet")
+      click_button "Share"
+    end
 
     assert_match /Update created/, page.body
   end
@@ -194,9 +181,11 @@ class RstatusTest < MiniTest::Unit::TestCase
     a = Factory(:authorization, :user => u)
     log_in(u, a.uid)
 
-    fill_in "text", :with => update_text
-    uncheck("tweet")
-    click_button "Share"
+    VCR.use_cassette('publish_to_hub') do
+      fill_in "text", :with => update_text
+      uncheck("tweet")
+      click_button "Share"
+    end
 
     assert_match /Update created/, page.body
   end
@@ -208,9 +197,11 @@ class RstatusTest < MiniTest::Unit::TestCase
     a = Factory(:authorization, :user => u, :provider => "facebook")
     log_in_fb(u, a.uid)
 
-    fill_in "text", :with => update_text
-    uncheck("facebook")
-    click_button "Share"
+    VCR.use_cassette('publish_to_hub') do
+      fill_in "text", :with => update_text
+      uncheck("facebook")
+      click_button "Share"
+    end
 
     assert_match /Update created/, page.body
   end
@@ -220,9 +211,11 @@ class RstatusTest < MiniTest::Unit::TestCase
     Twitter.expects(:update).never
     u = Factory(:user)
     log_in_email(u)
-    
-    fill_in "text", :with => update_text
-    click_button "Share"
+
+    VCR.use_cassette('publish_to_hub') do
+      fill_in "text", :with => update_text
+      click_button "Share"
+    end
 
     assert_match /Update created/, page.body
   end
@@ -232,9 +225,11 @@ class RstatusTest < MiniTest::Unit::TestCase
     FbGraph::User.expects(:me).never
     u = Factory(:user)
     log_in_email(u)
-    
-    fill_in "text", :with => update_text
-    click_button "Share"
+
+    VCR.use_cassette('publish_to_hub') do
+      fill_in "text", :with => update_text
+      click_button "Share"
+    end
 
     assert_match /Update created/, page.body
   end
