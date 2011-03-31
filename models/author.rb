@@ -15,11 +15,11 @@ class Author
 
   one :feed
   one :user
-  many :notifications, :dependant => :destroy
+  many :notifications, :class_name => "Notification", :dependent => :destroy
 
  # The url of their profile page
   key :remote_url, String
-  
+
   # This takes results from an omniauth reponse and generates an author
   def self.create_from_hash!(hsh)
     create!(

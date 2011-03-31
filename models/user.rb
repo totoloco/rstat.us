@@ -2,7 +2,7 @@ class User
   require 'digest/md5'
 
   include MongoMapper::Document
-  many :authorizations, :dependant => :destroy
+  many :authorizations, :dependent => :destroy
 
   # Make the username required
   # However, this will break it when email authorization is used
@@ -104,7 +104,7 @@ class User
       followee = User.first(:author_id => f.author.id)
       followee.followers << self.feed
       followee.save
-      notification = FollowedNotification.new(:author_id => f.author_id)
+      notification = FollowedNotification.new(:author => f.author)
       notification.target = self
       notification.save
     end
