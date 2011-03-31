@@ -11,7 +11,8 @@ If you'd like to contribute, here are some details:
 - The stack: ruby/sinatra/mongodb
 - [The code][code]
 - [The documentation][docs] (need lots of improvement here!)
-- [The Issues list][issues]
+- [The Issues list][issues], currently being moved to lighthouse from
+  github.
 - Please fork the project and make a pull request
   - Pull requests will not be merged without tests/documentation
     - We use [minitest][minitest]/[capybara][capy] for tests
@@ -20,7 +21,7 @@ If you'd like to contribute, here are some details:
 
 [code]: http://github.com/hotsh/rstat.us
 [docs]: http://hotsh.github.com/rstat.us/
-[issues]: http://github.com/hotsh/rstat.us/issues
+[issues]: http://rstatus.lighthouseapp.com/
 [minitest]: https://github.com/seattlerb/minitest
 [capy]: https://github.com/jnicklas/capybara
 [docco]: https://github.com/jashkenas/docco
@@ -57,10 +58,13 @@ Bam! Visit http://localhost:9292/ in your browser, and you'll be good.
 Compiling CSS and Javascript
 ----------------------------
 
-For performance reasons, we're currently compressing our stylesheets and
-javascripts, as well as embedding what images we can. To compile Coffeescript
-(.coffee) or Sassy CSS (.scss) files for the site to use, use the following
-rake task:
+We use Coffeescript (.coffee) or Sassy CSS (.scss) for javascript and CSS development 
+respectively. When running the site locally, these files will automatically be
+compiled by the application when requested.
+
+When preparing for deployment, we compress our stylesheets and javascripts, as 
+well as embedding what images we can. To compile Coffeescript and SCSS,
+use the following rake task:
 
     $ rake assets:compile
 
