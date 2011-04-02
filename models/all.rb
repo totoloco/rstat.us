@@ -1,6 +1,10 @@
+require_relative 'notification'
 require_relative 'author'
 require_relative 'update'
 require_relative 'authorization'
 require_relative 'user'
 require_relative 'notifier'
 require_relative 'feed'
+require_relative 'followed_notification'
+require_relative 'mentioned_notification'
+

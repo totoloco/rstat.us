@@ -1,7 +1,8 @@
 - if current_user.nil?
   - nav = [{:url => "/updates", :name => "World"}]
 - else
-  - nav = [{:url => "/", :name => "Timeline"}, {:url => "/replies", :name => "Replies"}, {:url => "/updates", :name => "World"}]
+  - notification_count = Notification.count(:read => false, :author_id => current_user.author_id)
+  - nav = [{:url => "/", :name => "Timeline"}, {:url => "/replies", :name => "Replies"}, {:url => "/notifications", :name => "Notifications (#{notification_count})"}, {:url => "/updates", :name => "World"}]
 - unless @hashtag.nil?
   - nav << {:url => "/hashtags/#{@hashtag}", :name => "##{@hashtag}"}
 #navigation

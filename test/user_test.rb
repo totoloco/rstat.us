@@ -20,7 +20,7 @@ class UserTest < MiniTest::Unit::TestCase
     Update.create(:text => "just some other update")
 
     assert_equal 1, Update.hashtag_search("hashtags", {}).length
-    assert_equal update.id, Update.hashtag_search("hashtags", {}).first.id 
+    assert_equal update.id, Update.hashtag_search("hashtags", {}).first.id
   end
 
   def test_username_is_unique
@@ -28,31 +28,31 @@ class UserTest < MiniTest::Unit::TestCase
     u = Factory.build(:user, :username => "steve")
     refute u.save
   end
-  
+
   def test_user_has_twitter
     u = Factory.create(:user)
     a = Factory.create(:authorization, :user => u)
     assert u.twitter?
   end
-  
+
   def test_user_returns_twitter
     u = Factory.create(:user)
     a = Factory.create(:authorization, :user => u)
     assert_equal a, u.twitter
   end
-  
+
   def test_user_has_facebook
     u = Factory.create(:user)
     a = Factory.create(:authorization, :user => u, :provider => "facebook")
     assert u.facebook?
   end
-  
+
   def test_user_returns_facebook
     u = Factory.create(:user)
     a = Factory.create(:authorization, :user => u, :provider => "facebook")
     assert_equal a, u.facebook
   end
-  
+
   def test_set_reset_password_token
     u = Factory.create(:user)
     assert_nil u.perishable_token
@@ -61,7 +61,7 @@ class UserTest < MiniTest::Unit::TestCase
     refute u.perishable_token.nil?
     refute u.password_reset_sent.nil?
   end
-  
+
   def test_reset_password
     u = Factory.create(:user)
     u.password = "test_password"
@@ -90,6 +90,20 @@ class UserTest < MiniTest::Unit::TestCase
   def test_username_cant_be_nil
     u = User.new :username => nil
     refute u.save, "nil username"
+  end
+
+  def test_followed_notification_creation
+    at = Factory(:author)
+    f = Factory(:feed, :author =>at)
+    u = Factory(:user, :username => "someone", :feed => f, :author => at)
+    at1 = Factory(:author)
+    f1 = Factory(:feed, :author =>at1)
+    u1 = Factory(:user, :username => "somebody", :feed => f1, :author => at1)
+
+    n = FollowedNotification.new(:author => at)
+    FollowedNotification.expects(:new).with(:author => at).returns(n)
+    u1.follow! f.url
+    assert_equal at.notifications.count, 1
   end
 
 end
