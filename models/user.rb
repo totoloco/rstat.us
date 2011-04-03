@@ -29,6 +29,9 @@ class User
   belongs_to :author
   belongs_to :feed
 
+  # TODO Maybe has_many and one current_theme
+  one :theme
+
   after_create :finalize
 
   # After a user is created, create the feed and reset the token
@@ -211,10 +214,12 @@ class User
   end
 
   def edit_user_profile(params)
-    author.name    = params[:name]
-    author.email   = params[:email]
-    author.website = params[:website]
-    author.bio     = params[:bio]
+    author.name        = params[:name]
+    author.email       = params[:email]
+    author.website     = params[:website]
+    author.bio         = params[:bio]
+    author.public_css  = params[:public_css]
+    author.profile_css = params[:profile_css]
     author.save
   end
 

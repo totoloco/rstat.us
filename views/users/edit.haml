@@ -54,3 +54,29 @@
     - else
       %form#profile-update{:action => "/auth/facebook", :method => "GET", :name => "profile_update_form"}
         %input#update-button.button{:type => "submit", :value => "Add Facebook Account"}
+
+  %br
+
+  %h4 Theme
+
+  %form#theme-update{:action => "/themes/#{current_user.author.username}", :method => "POST", :name => "theme_update_form"}
+    %input{:type => "hidden", :name => "_method", :value => "put"}
+
+    .public
+      %div
+        %label{:for => "public_style"}
+          Public Style:
+      %div
+        %textarea#public_style{:name => "public_style"}
+          - if @user.theme
+            #{@user.theme.public_style}
+    .profile
+      %div
+        %label{:for => "profile_style"}
+          Profile Style:
+      %div
+        %textarea#profile_style{:name => "profile_style"}
+          - if @user.theme
+            #{@user.theme.profile_style}
+
+      %input#update-button.button{:type => "submit", :value => "Save Theme"}
