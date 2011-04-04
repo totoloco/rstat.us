@@ -162,6 +162,11 @@ class Rstatus
   get "/users/:username/edit" do
     @user = User.first :username => params[:username]
     if @user == current_user
+      if @user.theme.nil?
+        @user.theme = Theme.new(
+          :user => @user
+        )
+      end
       haml :"users/edit"
     else
       redirect "/users/#{params[:username]}"

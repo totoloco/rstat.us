@@ -280,7 +280,10 @@ form#update-form {
 
   label {
     display: inline-block;
-    width: 6em;
+    width: 5em;
+  }
+  label.long {
+    width: 6.5em;
   }
 
   .gravatar {

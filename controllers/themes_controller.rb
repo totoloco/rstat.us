@@ -1,35 +1,14 @@
 class Rstatus
   get '/themes/:username/public.css' do
-    user = User.first :username => params[:username]
-    content = ""
-    if user
-      if user.theme.nil?
-        t = Theme.new(
-          :user => user
-        )
-      else
-        content = user.theme.public_style
-      end
-    end
-    content_type 'text/css', :charset => 'utf-8'
-    content
+    get_user_css(params[:username], :public_style)
   end
 
   get '/themes/:username/profile.css' do
-    user = User.first :username => params[:username]
-    content = ""
-    if user
-      if user.theme.nil?
-        t = Theme.new(
-          :user => user
-        )
-      else
-        content = user.theme.profile_style
-      end
-    end
-    layout = false
-    content_type 'text/css', :charset => 'utf-8'
-    content
+    get_user_css(params[:username], :profile_style)
+  end
+
+  get '/themes/:username/other.css' do
+    get_user_css(params[:username], :other_style)
   end
 
   put '/themes/:username' do
@@ -42,9 +21,7 @@ class Rstatus
       else
         t = @user.theme
       end
-      t.public_style  = params[:public_style]
-      t.profile_style = params[:profile_style]
-      if t.save
+      if t.edit(params)
         flash[:notice] = "Theme saved!"
       else
         flash[:notice] = "Theme could not be saved!"
@@ -53,5 +30,22 @@ class Rstatus
       redirect "/"
     end
     redirect "/users/#{params[:username]}"
+  end
+
+  def get_user_css(username, name)
+    user = User.first :username => username
+    content = ""
+    if user
+      if user.theme.nil?
+        t = Theme.new(
+          :user => user
+        )
+      else
+        content = user.theme.send(name)
+      end
+    end
+    layout = false
+    content_type 'text/css', :charset => 'utf-8'
+    content
   end
 end

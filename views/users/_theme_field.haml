@@ -1,0 +1,8 @@
+.theme_field{:class => attr}
+  %div
+    %label{:for => :attr, :class => "long"}
+      #{attr.to_s.gsub("_"," ").capitalize}:
+  %div
+    %textarea#profile_style{:name => attr}
+      - if @user.theme and @user.theme.send(attr)
+        #{@user.theme.send(attr)}

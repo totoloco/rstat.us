@@ -11,23 +11,29 @@
     %script{:src => "/js/lib/jquery.equalHeights.js"}
     %script{:src => "/js/lib/dev/coffee-script.js"}
     %script{:type => "text/coffeescript", :src => "/js/main.coffee"}
-    %link{:href => "/dev/screen.css", :media => "screen", :rel => "stylesheet"}
+    - if current_user.nil? or current_user.theme.nil? or !current_user.theme.reset_style
+      %link{:href => "/dev/screen.css", :media => "screen", :rel => "stylesheet"}
 
   - else
     %script{:src => "/assets/app.js"}
-    <!--[if (!IE)|(gte IE 8)]><!-->
-    %link{:href => "/assets/screen-datauri.css", :media => "screen", :rel => "stylesheet"}
-    <!--<![endif]-->
-    /[if lte IE 7]
-      %link{:href => "assets/screen.css", :media => "screen", :rel => "stylesheet", :type => "text/css"}
+    - if current_user.nil? or current_user.theme.nil? or !current_user.theme.reset_style
+      <!--[if (!IE)|(gte IE 8)]><!-->
+      %link{:href => "/assets/screen-datauri.css", :media => "screen", :rel => "stylesheet"}
+      <!--<![endif]-->
+      /[if lte IE 7]
+        %link{:href => "assets/screen.css", :media => "screen", :rel => "stylesheet", :type => "text/css"}
     %link{:rel => "apple-touch-icon-precomposed", :sizes => "114x114", :href => "images/mobile_icons/apple-touch-icon_114.png"}
     %link{:rel => "apple-touch-icon-precomposed", :sizes => "72x72", :href => "images/mobile_icons/apple-touch-icon_72.png"}
     %link{:rel => "apple-touch-icon-precomposed", :href => "images/mobile_icons/apple-touch-icon.png"}
 
+  -# TODO ver other_user
   - if current_user
     %link{:href => "/themes/#{current_user.username}/public.css", :media => "screen", :rel => "stylesheet"}
   - if @author
-    %link{:href => "/themes/#{@author.username}/profile.css", :media => "screen", :rel => "stylesheet"}
+    - if current_user and @author.username = current_user.username
+      %link{:href => "/themes/#{@author.username}/other.css", :media => "screen", :rel => "stylesheet"}
+    - else
+      %link{:href => "/themes/#{@author.username}/profile.css", :media => "screen", :rel => "stylesheet"}
 
   != yield_content :css
 
